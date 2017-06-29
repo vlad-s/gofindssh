@@ -32,8 +32,8 @@ func usage() {
 Usage: %s [-h HOST:PORT] [-u USERS] [-p PASSWORDS] [-d]
 
 Examples:
-	%s -h 127.0.0.1:22 -u my-users.txt -p my-passes.txt
-	%s -h victim.tld:2233 -u users.txt -p passwords.lst -d
+	%s -h 127.0.0.1:22 -u my-users.txt -p my-passes.txt -o results.txt
+	%s -h victim.tld:2233 -u users.txt -p passwords.lst -d > output.txt
 `, os.Args[0], os.Args[0], os.Args[0])
 	os.Exit(1)
 }
@@ -50,13 +50,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	users, err := readUsers(*userList)
+	users, err := readFile(*userList)
 	if err != nil {
 		log.Println("Can't read user list, exiting.")
 		os.Exit(1)
 	}
 
-	passwords, err := readPasswords(*passList)
+	passwords, err := readFile(*passList)
 	if err != nil {
 		log.Println("Can't read passwords list, exiting.")
 		os.Exit(1)
@@ -138,30 +138,16 @@ func connect(wg *sync.WaitGroup, o *os.File, user, pass string) {
 	<-throttler
 }
 
-func readUsers(f string) (users []string, err error) {
-	u, err := os.Open(f)
+func readFile(f string) (data []string, err error) {
+	b, err := os.Open(f)
 	if err != nil {
 		return
 	}
-	defer u.Close()
+	defer b.Close()
 
-	scanner := bufio.NewScanner(u)
+	scanner := bufio.NewScanner(b)
 	for scanner.Scan() {
-		users = append(users, scanner.Text())
-	}
-	return
-}
-
-func readPasswords(f string) (passwords []string, err error) {
-	p, err := os.Open(f)
-	if err != nil {
-		return
-	}
-	defer p.Close()
-
-	scanner := bufio.NewScanner(p)
-	for scanner.Scan() {
-		passwords = append(passwords, scanner.Text())
+		data = append(data, scanner.Text())
 	}
 	return
 }

@@ -1,5 +1,6 @@
 gofindssh
 ===
+More about this here: https://www.vlads.me/2017/06/29/writing-a-simple-ssh-bruteforcer-in-go/
 
 This tool is part of the learning process of the Go programming language.
 
